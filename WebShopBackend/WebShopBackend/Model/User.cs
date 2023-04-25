@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace WebShopBackend.Model
 {
     public enum UserType {ADMIN, CUSTOMER, SALESMAN };
-    public class User
+    public abstract class User
     {
         public int Id { get; set; }
         public string UserName { get; set; }

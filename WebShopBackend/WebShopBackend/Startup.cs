@@ -1,7 +1,9 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,6 +13,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebShop.Interface;
+using WebShopBackend.Infrastructure;
+using WebShopBackend.Mapping;
+using WebShopBackend.Services;
 
 namespace WebShopBackend
 {
@@ -32,6 +38,19 @@ namespace WebShopBackend
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebShopBackend", Version = "v1" });
             });
+
+            services.AddScoped<IUserService, UserService>();
+
+            //registracija db contexta u kontejneru zavisnosti, njegov zivotni vek je Scoped
+            services.AddDbContext<WebShopDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WebShopDataBase")));
+            //Registracija mapera u kontejneru, zivotni vek singleton
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

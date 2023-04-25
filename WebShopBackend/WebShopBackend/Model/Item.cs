@@ -13,7 +13,7 @@ namespace WebShopBackend.Model
         public int Amount { get; set; }
         public string Description { get; set; }
         public byte[] ItemImg { get; set; }
-        public int CustomerId { get; set; }
-        public User Customer { get; set; }
+        public int SalesmanId { get; set; }
+        public Salesman Salesman{ get; set; }
     }
 }

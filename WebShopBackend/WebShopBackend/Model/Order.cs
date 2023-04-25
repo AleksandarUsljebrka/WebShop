@@ -11,7 +11,7 @@ namespace WebShopBackend.Model
         public int CustomerId { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? DeliveryDate { get; set; }
-        public User Costumer{ get; set; }
+        public Customer Custumer{ get; set; }
         public string OrderAddress { get; set; }
         public string Comment { get; set; }
         public List<ItemOrder> Items { get; set; }
