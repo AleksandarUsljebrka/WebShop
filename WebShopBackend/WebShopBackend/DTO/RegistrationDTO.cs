@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebShopBackend.Model
+namespace WebShopBackend.DTO
 {
-    
-    public abstract class User
+    public class RegistrationDTO
     {
-        public int Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -16,6 +14,7 @@ namespace WebShopBackend.Model
         public string LastName { get; set; }
         public DateTime BirthDate { get; set; }
         public string Address { get; set; }
+        public string Role { get; set; }
         //public byte[] Image { get; set; }
         
     }

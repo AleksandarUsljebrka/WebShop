@@ -18,8 +18,8 @@ namespace WebShopBackend.Infrastructure
             builder.Property(x => x.Name).HasMaxLength(20);
             builder.Property(x => x.LastName).HasMaxLength(20);
 
-            builder.HasIndex(x => x.UserName).IsUnique();
-            builder.Property(x => x.UserName).HasMaxLength(20);
+            builder.HasIndex(x => x.Username).IsUnique();
+            builder.Property(x => x.Username).HasMaxLength(20);
 
         }
     }
