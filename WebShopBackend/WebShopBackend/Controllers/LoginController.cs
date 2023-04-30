@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebShop.Interface;
 using WebShopBackend.DTO;
+using WebShopBackend.Interface;
 
 namespace WebShopBackend.Controllers
 {
@@ -13,15 +14,22 @@ namespace WebShopBackend.Controllers
     public class LoginController : Controller
     {
         private readonly IUserService _userService;
-        public LoginController(IUserService userService)
+        private readonly IAuthenticateService _authService;
+        public LoginController(IAuthenticateService authService, IUserService userService)
         {
             _userService = userService;
+            _authService = authService;
         }
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDTO loginDTO)
+        public IActionResult Login([FromBody] LoginDTO loginDto)
         {
-           
-            return Ok("Doesn't work yet");
+            var token = _authService.Authenticate(loginDto);
+            if (token == null)
+            {
+                return BadRequest(new { message = "Invalid username or password" });
+            }
+            return Ok(new { token });
         }
+
     }
 }

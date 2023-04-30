@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using WebShop.Interface;
 using WebShopBackend.DTO;
 using WebShopBackend.Infrastructure;
+using WebShopBackend.Interface;
 using WebShopBackend.Model;
 
 namespace WebShopBackend.Controllers
@@ -15,10 +16,11 @@ namespace WebShopBackend.Controllers
     public class RegistrationController : Controller
     {
         private readonly IUserService _userService;
-        
-        public RegistrationController(IUserService userService)
+        private readonly IRegistrationService _regService;
+        public RegistrationController(IUserService userService, IRegistrationService regService)
         {
             _userService = userService;
+            _regService = regService;
         }
         [HttpPost("registration")]
         public IActionResult Register([FromBody] RegistrationDTO registrationDto)
@@ -32,7 +34,7 @@ namespace WebShopBackend.Controllers
                     return BadRequest("Username already exists.");
                 }
 
-                var result = _userService.RegisterUser(registrationDto);
+                var result = _regService.RegisterUser(registrationDto);
 
                 if (result == null)
                 {

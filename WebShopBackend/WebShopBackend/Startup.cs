@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -8,13 +9,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using WebShop.Interface;
 using WebShopBackend.Infrastructure;
+using WebShopBackend.Interface;
 using WebShopBackend.Mapping;
 using WebShopBackend.Services;
 
@@ -22,6 +26,8 @@ namespace WebShopBackend
 {
     public class Startup
     {
+        private readonly string _cors = "cors";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -37,9 +43,71 @@ namespace WebShopBackend
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebShopBackend", Version = "v1" });
+                //Ovo dodajemo kako bi mogli da unesemo token u swagger prilikom testiranja
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type=ReferenceType.SecurityScheme,
+                                Id="Bearer"
+                            }
+                        },
+                        new string[]{}
+                    }
+                });
             });
 
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("SamoOdabrani", policy => policy.RequireClaim("Neki_moj_claim")); //Ovde mozemo kreirati pravilo za validaciju nekog naseg claima
+            });
+
+            //Dodajemo semu autentifikacije i podesavamo da se radi o JWT beareru
+            services.AddAuthentication(opt => {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+           .AddJwtBearer(options =>
+           {
+               options.TokenValidationParameters = new TokenValidationParameters //Podesavamo parametre za validaciju pristiglih tokena
+               {
+                   ValidateIssuer = true, //Validira izdavaoca tokena
+                   ValidateAudience = false, //Kazemo da ne validira primaoce tokena
+                   ValidateLifetime = true,//Validira trajanje tokena
+                   ValidateIssuerSigningKey = true, //validira potpis token, ovo je jako vazno!
+                   ValidIssuer = "http://localhost:44365", //odredjujemo koji server je validni izdavalac
+                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]))//navodimo privatni kljuc kojim su potpisani nasi tokeni
+               };
+           });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: _cors, builder => {
+                    builder.WithOrigins("https://localhost:4200")//Ovde navodimo koje sve aplikacije smeju kontaktirati nasu,u ovom slucaju nas Angular front
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .AllowCredentials();
+                });
+            });
+
+
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthenticateService, AuthenticateService>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
+
 
             //registracija db contexta u kontejneru zavisnosti, njegov zivotni vek je Scoped
             services.AddDbContext<WebShopDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WebShopDataBase")));
@@ -65,8 +133,12 @@ namespace WebShopBackend
 
             app.UseHttpsRedirection();
 
+            app.UseCors(_cors);
+
             app.UseRouting();
 
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
