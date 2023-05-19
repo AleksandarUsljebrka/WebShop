@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using WebShop.Interface;
 using WebShopBackend.DTO;
 using WebShopBackend.Interface;
+using WebShopBackend.Model;
 
 namespace WebShopBackend.Controllers
 {
@@ -30,6 +32,12 @@ namespace WebShopBackend.Controllers
             }
             return Ok(new { token });
         }
-
+        [HttpGet("get")]
+        [Authorize(Roles = "customer")]
+        public IActionResult CustomerReq()
+        {
+           
+            return Ok("VIDIS OVO");
+        }
     }
 }

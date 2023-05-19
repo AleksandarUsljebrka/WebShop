@@ -10,6 +10,6 @@ namespace WebShop.Interface
     public interface IUserService
     {
         public bool UserExists(string username, string role);
-        public User SearchUser(string username);
+        public LoginDTO SearchUser(string username);
     }
 }

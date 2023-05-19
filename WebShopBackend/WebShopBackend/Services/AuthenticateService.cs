@@ -47,7 +47,7 @@ namespace WebShopBackend.Services
                 SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey.Value));
                 var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
                 var tokeOptions = new JwtSecurityToken(
-                    issuer: "http://localhost:44398", //url servera koji je izdao token
+                    issuer: "http://localhost:44365", //url servera koji je izdao token
                     claims: claims, 
                     expires: DateTime.Now.AddMinutes(20), 
                     signingCredentials: signinCredentials 

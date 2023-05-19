@@ -96,7 +96,7 @@ namespace WebShopBackend
             services.AddCors(options =>
             {
                 options.AddPolicy(name: _cors, builder => {
-                    builder.WithOrigins("https://localhost:4200")//Ovde navodimo koje sve aplikacije smeju kontaktirati nasu,u ovom slucaju nas Angular front
+                    builder.WithOrigins("https://localhost:3000")//Ovde navodimo koje sve aplikacije smeju kontaktirati nasu,u ovom slucaju nas Angular front
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .AllowCredentials();
