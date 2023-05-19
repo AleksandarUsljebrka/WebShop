@@ -31,20 +31,33 @@ namespace WebShopBackend.Services
         }
      
 
-        public User SearchUser(string username)
+        public LoginDTO SearchUser(string username)
         {
+            LoginDTO loginDtoBack = new LoginDTO();
+            loginDtoBack.Password = null;
+            loginDtoBack.Username = null;
+
             var customer = _dbContext.Customers.FirstOrDefault(c => c.Username == username);
             var salesman = _dbContext.Salesmen.FirstOrDefault(s => s.Username == username);
             var admin = _dbContext.Admins.FirstOrDefault(a => a.Username == username);
 
             if (customer != null)
-                return customer;
+            {
+                loginDtoBack.Password = customer.Password;
+                loginDtoBack.Username = customer.Username;
+            }
             if (salesman != null)
-                return salesman;
+            {
+                loginDtoBack.Password = salesman.Password;
+                loginDtoBack.Username = salesman.Username;
+            }
             if (admin != null)
-                return admin;
+            {
+                loginDtoBack.Password = admin.Password;
+                loginDtoBack.Username = admin.Username;
+            }
 
-            return null;
+            return loginDtoBack;
 
         }
         public bool UserExists(string username, string role)
